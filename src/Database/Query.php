@@ -37,7 +37,7 @@ class Query implements ExpressionInterface, IteratorAggregate
     /**
      * Connection instance to be used to execute this query.
      *
-     * @var \Cake\Datasource\ConnectionInterface
+     * @var \Cake\Datasource\ConnectionInterface|\Cake\Database\Connection
      */
     protected $_connection;
 
@@ -164,7 +164,7 @@ class Query implements ExpressionInterface, IteratorAggregate
     /**
      * Gets the connection instance to be used for executing and transforming this query.
      *
-     * @return \Cake\Datasource\ConnectionInterface
+     * @return \Cake\Datasource\ConnectionInterface|\Cake\Database\Connection
      */
     public function getConnection()
     {
@@ -211,10 +211,10 @@ class Query implements ExpressionInterface, IteratorAggregate
     public function execute()
     {
         $statement = $this->_connection->run($this);
-        $driver = $this->_connection->driver();
         $typeMap = $this->getSelectTypeMap();
 
         if ($typeMap->toArray() && $this->_typeCastAttached === false) {
+            $driver = $this->_connection->getDriver();
             $this->decorateResults(new FieldTypeConverter($typeMap, $driver));
             $this->_typeCastAttached = true;
         }

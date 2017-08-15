@@ -219,7 +219,7 @@ class Connection implements ConnectionInterface
     public function connect()
     {
         try {
-            return $this->_driver->connect();
+            return $this->getDriver()->connect();
         } catch (\Exception $e) {
             throw new MissingConnectionException(['reason' => $e->getMessage()]);
         }
@@ -232,7 +232,7 @@ class Connection implements ConnectionInterface
      */
     public function disconnect()
     {
-        $this->_driver->disconnect();
+        $this->getDriver()->disconnect();
     }
 
     /**
@@ -242,7 +242,7 @@ class Connection implements ConnectionInterface
      */
     public function isConnected()
     {
-        return $this->_driver->isConnected();
+        return $this->getDriver()->isConnected();
     }
 
     /**
@@ -253,7 +253,7 @@ class Connection implements ConnectionInterface
      */
     public function prepare($sql)
     {
-        $statement = $this->_driver->prepare($sql);
+        $statement = $this->getDriver()->prepare($sql);
 
         if ($this->_logQueries) {
             $statement = $this->_newLogger($statement);
@@ -445,7 +445,7 @@ class Connection implements ConnectionInterface
             if ($this->_logQueries) {
                 $this->log('BEGIN');
             }
-            $this->_driver->beginTransaction();
+            $this->getDriver()->beginTransaction();
             $this->_transactionLevel = 0;
             $this->_transactionStarted = true;
             $this->nestedTransactionRollbackException = null;
@@ -483,7 +483,7 @@ class Connection implements ConnectionInterface
                 $this->log('COMMIT');
             }
 
-            return $this->_driver->commitTransaction();
+            return $this->getDriver()->commitTransaction();
         }
         if ($this->isSavePointsEnabled()) {
             $this->releaseSavePoint($this->_transactionLevel);
@@ -518,7 +518,7 @@ class Connection implements ConnectionInterface
             if ($this->_logQueries) {
                 $this->log('ROLLBACK');
             }
-            $this->_driver->rollbackTransaction();
+            $this->getDriver()->rollbackTransaction();
 
             return true;
         }
@@ -552,7 +552,7 @@ class Connection implements ConnectionInterface
         if ($enable === false) {
             $this->_useSavePoints = false;
         } else {
-            $this->_useSavePoints = $this->_driver->supportsSavePoints();
+            $this->_useSavePoints = $this->getDriver()->supportsSavePoints();
         }
 
         return $this;
@@ -603,7 +603,7 @@ class Connection implements ConnectionInterface
      */
     public function createSavePoint($name)
     {
-        $this->execute($this->_driver->savePointSQL($name))->closeCursor();
+        $this->execute($this->getDriver()->savePointSQL($name))->closeCursor();
     }
 
     /**
@@ -614,7 +614,7 @@ class Connection implements ConnectionInterface
      */
     public function releaseSavePoint($name)
     {
-        $this->execute($this->_driver->releaseSavePointSQL($name))->closeCursor();
+        $this->execute($this->getDriver()->releaseSavePointSQL($name))->closeCursor();
     }
 
     /**
@@ -625,7 +625,7 @@ class Connection implements ConnectionInterface
      */
     public function rollbackSavepoint($name)
     {
-        $this->execute($this->_driver->rollbackSavePointSQL($name))->closeCursor();
+        $this->execute($this->getDriver()->rollbackSavePointSQL($name))->closeCursor();
     }
 
     /**
@@ -635,7 +635,7 @@ class Connection implements ConnectionInterface
      */
     public function disableForeignKeys()
     {
-        $this->execute($this->_driver->disableForeignKeySQL())->closeCursor();
+        $this->execute($this->getDriver()->disableForeignKeySQL())->closeCursor();
     }
 
     /**
@@ -645,7 +645,7 @@ class Connection implements ConnectionInterface
      */
     public function enableForeignKeys()
     {
-        $this->execute($this->_driver->enableForeignKeySQL())->closeCursor();
+        $this->execute($this->getDriver()->enableForeignKeySQL())->closeCursor();
     }
 
     /**
@@ -656,7 +656,7 @@ class Connection implements ConnectionInterface
      */
     public function supportsDynamicConstraints()
     {
-        return $this->_driver->supportsDynamicConstraints();
+        return $this->getDriver()->supportsDynamicConstraints();
     }
 
     /**
@@ -755,7 +755,7 @@ class Connection implements ConnectionInterface
     {
         list($value, $type) = $this->cast($value, $type);
 
-        return $this->_driver->quote($value, $type);
+        return $this->getDriver()->quote($value, $type);
     }
 
     /**
@@ -765,7 +765,7 @@ class Connection implements ConnectionInterface
      */
     public function supportsQuoting()
     {
-        return $this->_driver->supportsQuoting();
+        return $this->getDriver()->supportsQuoting();
     }
 
     /**
@@ -777,7 +777,7 @@ class Connection implements ConnectionInterface
      */
     public function quoteIdentifier($identifier)
     {
-        return $this->_driver->quoteIdentifier($identifier);
+        return $this->getDriver()->quoteIdentifier($identifier);
     }
 
     /**
